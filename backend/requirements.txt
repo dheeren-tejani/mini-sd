@@ -1,0 +1,16 @@
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+# Core ML
+torch==2.4.1
+diffusers==0.35.2
+transformers==4.57.3
+bitsandbytes
+numpy==2.3.5
+pillow==10.4.0
+tqdm==4.67.1
+matplotlib
+
+# API / Serving
+fastapi==0.124.0
+uvicorn==0.38.0
+uvicorn-standard==0.38.0

@@ -1,0 +1,8 @@
+# Python envs
+env/
+
+# Node Modules
+node_modules
+
+# Models 
+models/
