@@ -6,3 +6,6 @@ node_modules
 
 # Models 
 models/
+
+# Python cache
+__pycache__
