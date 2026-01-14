@@ -33,29 +33,59 @@ app.add_middleware(
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"🚀 Initializing RangeFlow on {DEVICE}...")
 
-# Initialize Architecture
+# 1. Initialize Architecture
 unet = UNet(UNetConfig()).to(DEVICE)
 vae = VAE(VAEConfig()).to(DEVICE)
 clip = CLIP(CLIPConfig()).to(DEVICE)
 
-# Load the FIXED Checkpoint
-# ⚠️ UPDATE THIS PATH to match your actual file location
-CHECKPOINT_PATH = "./unet_step_056000_FIXED.pt" 
-
+# 2. LOAD VAE WEIGHTS (Crucial!)
 try:
-    print(f"📂 Loading checkpoint from {CHECKPOINT_PATH}...")
-    ckpt = torch.load(CHECKPOINT_PATH, map_location=DEVICE)
-    unet.load_state_dict(ckpt['model_state_dict'])
-    print("✅ Weights Loaded Successfully")
-except FileNotFoundError:
-    print(f"❌ CRITICAL ERROR: Checkpoint not found at {CHECKPOINT_PATH}")
-    # We continue so the app starts, but generation will fail if not fixed
+    # Update path to where you stored your VAE checkpoint
+    vae_ckpt = torch.load("./models/vae/vae_best.pt", map_location=DEVICE)
+    # Handle if it's a full checkpoint dict or just state_dict
+    if 'model_state_dict' in vae_ckpt:
+        vae.load_state_dict(vae_ckpt['model_state_dict'])
+    else:
+        vae.load_state_dict(vae_ckpt)
+    print("✅ VAE Weights Loaded")
+except Exception as e:
+    print(f"❌ CRITICAL: Failed to load VAE: {e}")
 
-# Initialize Tokenizer & Wrapper
-# If you have 'tokenizer.pt', load it. Otherwise SimpleTokenizer uses defaults.
+# 3. LOAD CLIP WEIGHTS (Crucial!)
+try:
+    # Update path to where you stored your CLIP checkpoint
+    clip_ckpt = torch.load("./models/clip/clip_best.pt", map_location=DEVICE)
+    if 'model_state_dict' in clip_ckpt:
+        clip.load_state_dict(clip_ckpt['model_state_dict'])
+    else:
+        clip.load_state_dict(clip_ckpt)
+    print("✅ CLIP Weights Loaded")
+except Exception as e:
+    print(f"❌ CRITICAL: Failed to load CLIP: {e}")
+
+# 4. LOAD UNET (The one you are already loading)
+try:
+    # Use the FIXED checkpoint you verified
+    unet_path = "./models/unet/unet_step_056000_FIXED.pt" 
+    unet_ckpt = torch.load(unet_path, map_location=DEVICE)
+    
+    # ✅ EMA WEIGHTS LOGIC
+    if 'ema_model_state_dict' in unet_ckpt:
+        print(f"✨ Loading EMA Weights from {unet_path} (Smoother!)")
+        unet.load_state_dict(unet_ckpt['ema_model_state_dict'])
+    elif 'model_state_dict' in unet_ckpt:
+        print(f"⚠️ EMA not found in {unet_path}, loading standard weights.")
+        unet.load_state_dict(unet_ckpt['model_state_dict'])
+    else:
+        unet.load_state_dict(unet_ckpt)
+        
+    print("✅ UNet Weights Loaded")
+except Exception as e:
+    print(f"❌ CRITICAL: Failed to load UNet: {e}")
+
 tokenizer = SimpleTokenizer()
 try:
-    tokenizer_data = torch.load("tokenizer.pt", map_location=DEVICE)
+    tokenizer_data = torch.load("./models/tokenizer/tokenizer.pt", map_location=DEVICE)
     tokenizer.word2idx = tokenizer_data["word2idx"]
     tokenizer.idx2word = tokenizer_data["idx2word"]
     print("✅ Tokenizer Vocab Loaded")

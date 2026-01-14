@@ -9,3 +9,6 @@ models/
 
 # Python cache
 __pycache__
+
+# Dataset folder
+LAION_AESTHETIC_256/

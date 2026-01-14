@@ -1,3 +1,5 @@
+// frontend/src/pages/Index.tsx
+
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { Sidebar } from "@/components/Sidebar";
@@ -7,20 +9,12 @@ import { MobileDrawer } from "@/components/MobileDrawer";
 import { MobileHeader } from "@/components/MobileHeader";
 import { ImageModal } from "@/components/ImageModal";
 
-// Placeholder images for mock generation
-const PLACEHOLDER_IMAGES = [
-  "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=768&h=768&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=768&h=768&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=768&h=768&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=768&h=768&fit=crop&q=80",
-];
-
 const Index = () => {
   // Generation parameters
   const [steps, setSteps] = useState(30);
   const [cfg, setCfg] = useState(7.5);
   const [seed, setSeed] = useState(42);
-  const [dimensions, setDimensions] = useState<"512x512" | "768x768">("768x768");
+  const [dimensions, setDimensions] = useState<"512x512" | "768x768">("512x512");
 
   // Prompt state
   const [prompt, setPrompt] = useState("");
@@ -32,7 +26,10 @@ const Index = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleGenerate = useCallback(() => {
+  // ---------------------------------------------------------
+  // ⚡️ REAL BACKEND CONNECTION
+  // ---------------------------------------------------------
+  const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) {
       toast.error("Please enter a prompt");
       return;
@@ -41,19 +38,46 @@ const Index = () => {
     setIsLoading(true);
     setGeneratedImage(null);
 
-    // Simulate API call
-    setTimeout(() => {
-      const randomImage = PLACEHOLDER_IMAGES[Math.floor(Math.random() * PLACEHOLDER_IMAGES.length)];
-      setGeneratedImage(randomImage);
-      setIsLoading(false);
-      toast.success("Image generated successfully!");
-    }, 3000);
-  }, [prompt]);
+    try {
+      // 1. Send Request to your FastAPI Backend
+      const response = await fetch("http://localhost:8000/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          steps: steps,
+          cfg_scale: cfg,    // Maps 'cfg' to 'cfg_scale' for backend
+          seed: seed,
+          // Note: Backend currently ignores dimensions/negative_prompt 
+          // but we send them for future-proofing
+        }),
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Generation failed");
+      }
+
+      // 2. Get the Base64 Image
+      const data = await response.json();
+      
+      // 3. Display it
+      setGeneratedImage(data.image); 
+      toast.success("Image generated successfully!");
+
+    } catch (error) {
+      console.error("Generation Error:", error);
+      toast.error("Failed to connect. Is the backend running?");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [prompt, steps, cfg, seed]); // Dependencies
+
+  // ... (Keep handleDownload and handleExpand exactly the same)
   const handleDownload = useCallback(() => {
     if (!generatedImage) return;
-
-    // Create a link to download the image
     const link = document.createElement("a");
     link.href = generatedImage;
     link.download = `rangeflow-${Date.now()}.png`;
@@ -61,7 +85,6 @@ const Index = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
     toast.success("Download started!");
   }, [generatedImage]);
 
