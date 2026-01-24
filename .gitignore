@@ -11,4 +11,5 @@ models/
 __pycache__
 
 # Dataset folder
-LAION_AESTHETIC_256/
+LAION_AESTHETIC_512/
+laion_512.tar

@@ -4,7 +4,7 @@ import json
 from tqdm import tqdm
 from datetime import datetime
 from datasets import load_dataset
-import io  # <--- NEW: Required to read raw bytes
+import io
 import torch
 import re
 from collections import Counter
@@ -12,7 +12,7 @@ from collections import Counter
 # ==============================================================================
 # CONFIGURATION
 # ==============================================================================
-OUTPUT_DIR = "LAION_AESTHETIC_256"
+OUTPUT_DIR = "LAION_AESTHETIC_512"
 TARGET_SIZE = 512
 MAX_IMAGES = None  # Download ALL (~167k)
 # ==============================================================================
@@ -45,7 +45,6 @@ for item in pbar:
         break
 
     try:
-        # 🟢 THE FIX: Handle Dictionary / Raw Bytes
         img_data = item.get('image')
         
         if isinstance(img_data, dict) and 'bytes' in img_data:
