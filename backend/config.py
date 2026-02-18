@@ -61,7 +61,7 @@ class ServerConfig:
     # ── Checkpoint paths — EDIT THESE DEFAULTS ────────────────────────
     vae_path: str       = field(default_factory=lambda: _path("VAE_PATH",       "./models/vae/vae_final.pt"))
     clip_path: str      = field(default_factory=lambda: _path("CLIP_PATH",      "./models/clip/clip_final.pt"))
-    unet_path: str      = field(default_factory=lambda: _path("UNET_PATH",      "./models/unet/unet_step_017000.pt"))
+    unet_path: str      = field(default_factory=lambda: _path("UNET_PATH",      "./models/unet/unet_final.pt"))
     tokenizer_path: str = field(default_factory=lambda: _path("TOKENIZER_PATH", "./models/tokenizer/tokenizer.pt"))
 
     # Server
