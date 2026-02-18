@@ -219,7 +219,7 @@ A sliding window keeps only the latest `max_checkpoints=2` step checkpoints to s
 
 ### Loss Curves
 
-You can see the loss curves for VAE, CLIP, UNet here, [VAE Curves](./metadata/vae/vae_training_curves), [CLIP Curves](./metadata/clip/clip_training_curves), [UNet Curves](./metadata/unet/unet_training_curves).
+You can see the loss curves for VAE, CLIP, UNet here, [VAE Curves](./metadata/vae/vae_training_curves.png), [CLIP Curves](./metadata/clip/clip_training_curves.png), [UNet Curves](./metadata/unet/unet_training_curves.png).
 
 ---
 
