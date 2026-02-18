@@ -80,7 +80,7 @@ const Index = () => {
     if (!generatedImage) return;
     const link = document.createElement("a");
     link.href = generatedImage;
-    link.download = `rangeflow-${Date.now()}.png`;
+    link.download = `toySD-${Date.now()}.png`;
     link.target = "_blank";
     document.body.appendChild(link);
     link.click();

@@ -61,7 +61,7 @@ export const Sidebar = ({
           <Zap className="h-4 w-4 text-primary" />
         </div>
         <div>
-          <h1 className="text-base font-semibold tracking-tight">RangeFlow</h1>
+          <h1 className="text-base font-semibold tracking-tight">Toy SD</h1>
           <p className="text-xs text-muted-foreground">AI Image Studio</p>
         </div>
       </div>
